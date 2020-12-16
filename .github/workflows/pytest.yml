@@ -1,0 +1,62 @@
+name: PyTest Action Job
+
+on: [push]
+
+jobs:
+  run-script:
+    name: Run script
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          
+      - name: Test with pytest
+        run: |
+          pip install --requirement .scripts/requirements.txt
+          
+      - shell: bash
+        run: |
+          ##
+          ## Print README.md
+          ## 
+          echo "README.md"
+          bash .scripts/run.sh
+          echo "Evaluating Exercise 01 Participation"
+          cd 01
+          bash .scripts/run.sh
+          cd ..
+          echo "Evaluating Exercise 02 Participation"
+          cd 02
+          bash .scripts/run.sh
+          cd ..
+          echo "Evaluating Exercise 03 Participation"
+          cd 03
+          bash .scripts/run.sh
+          cd ..
+          echo "Evaluating Exercise 04 Participation"
+          cd 04
+          bash .scripts/run.sh
+          cd ..
+
+
+      - name: Commit files
+        run: |
+          date > generated.txt
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit --message "generated"
+          git push
